@@ -5,8 +5,6 @@ Repository for Sadhguru video recommendation project
 STATUS: [ONGOING]
 
 
-1. Update README.md.
-
 ## ON-GOING TASKS:
 1. youtube_client.py -> adding `from_channel()` method to retrieve all videos under a channel.
 2. chunker.py -> started implementation.
