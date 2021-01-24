@@ -197,10 +197,7 @@ class YouTubeClient:
 
     def from_playlist(self, *playlists: Union[str, list]) -> pd.DataFrame:
         """"""
-
-        def extract_playlist_id(playlist):
-            return playlist[playlist.find("&list=") + 6 :]
-
+        extract_playlist_id = lambda playlist: playlist[playlist.find("&list=") + 6 :]
         playlist_ids = [extract_playlist_id(playlist) for playlist in playlists]
         playlist_metadata = self._from_playlist_ids(*playlist_ids)
         extract_dict = {
