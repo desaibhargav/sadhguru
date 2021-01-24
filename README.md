@@ -17,4 +17,4 @@ STATUS: [ONGOING]
 1. Native datastructure handling and compatibility for outputs from youtube_client.py by chunker.py, nmf.py and zeroshot.py.
 2. Consistent outputs (in schema) for `from_channel()` and `from_playlists()` methods in youtube_client.py.
 3. Update README.md (with basic usage, documentation and purpose of the project).
-4. *Add comments for youtube_client.py*
+4. **Add comments for youtube_client.py**
