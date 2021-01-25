@@ -11,12 +11,23 @@ class Chunker:
             "length",
         ], "'chunk_by' must be one of ['time', 'length']"
         self.chunk_by = chunk_by
-        if self.chunk_by == "time":
-            self.expected_threshold = kwargs.get("expected_threshold", 60)
-            self.min_tolerable_threshold = kwargs.get("min_tolerable_threshold", 45)
-        if self.chunk_by == "length":
-            self.expected_threshold = kwargs.get("expected_threshold", 225)
-            self.min_tolerable_threshold = kwargs.get("min_tolerable_threshold", 150)
+        self._func_mapping_dict = {
+            "length": "_chunk_by_length",
+            "time": "_chunk_by_time",
+        }
+        self._default_values_dict = {
+            "length": {"expected_threshold": 225, "min_tolerable_threshold": 150},
+            "time": {"expected_threshold": 60, "min_tolerable_threshold": 45},
+        }
+
+        self.expected_threshold = kwargs.get(
+            "expected_threshold",
+            self._default_values_dict[self.chunk_by]["expected_threshold"],
+        )
+        self.min_tolerable_threshold = kwargs.get(
+            "min_tolerable_threshold",
+            self._default_values_dict[self.chunk_by]["min_tolerable_threshold"],
+        )
 
     def _chunk_by_time(
         self, video_id: str, subtitles: list, timestamps: list
@@ -80,7 +91,7 @@ class Chunker:
                 end_time=np.NaN,
             )
 
-    def get_chunks(self, scapped_df: pd.DataFrame) -> pd.DataFrame:
+    def get_chunks(self, scrapped_df: pd.DataFrame) -> pd.DataFrame:
         """"""
         make_df = lambda blocks: pd.DataFrame(list(blocks))
         index_df = (
@@ -88,26 +99,18 @@ class Chunker:
             .rename(columns={"index": "block_number"})
             .set_index(["videoId", "block_number"])
         )
-        if self.chunk_by == "time":
-            df = pd.concat(
-                [
-                    make_df(self._chunk_by_time(video_id, subtitles, timestamps))
-                    for video_id, subtitles, timestamps in zip(
-                        scapped_df.index.get_level_values("videoId"),
-                        scapped_df.subtitles,
-                        scapped_df.timestamps,
+        df = pd.concat(
+            [
+                make_df(
+                    getattr(self, self._func_mapping_dict[self.chunk_by])(
+                        video_id, subtitles, timestamps
                     )
-                ]
-            )
-        if self.chunk_by == "length":
-            df = pd.concat(
-                [
-                    make_df(self._chunk_by_length(video_id, subtitles, timestamps))
-                    for video_id, subtitles, timestamps in zip(
-                        scapped_df.index.get_level_values("videoId"),
-                        scapped_df.subtitles,
-                        scapped_df.timestamps,
-                    )
-                ]
-            )
+                )
+                for video_id, subtitles, timestamps in zip(
+                    scrapped_df.index.get_level_values("videoId"),
+                    scrapped_df.subtitles,
+                    scrapped_df.timestamps,
+                )
+            ]
+        )
         return index_df(df)
