@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import googleapiclient.discovery
-import googleapiclient.errors
 import time
 
 from itertools import chain
@@ -9,7 +8,6 @@ from functools import reduce
 from typing import Union, Callable, Generator
 from youtube_transcript_api import YouTubeTranscriptApi
 from tqdm import tqdm
-from pprint import pprint
 
 
 class YouTubeClient:
