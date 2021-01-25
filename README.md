@@ -9,7 +9,7 @@ STATUS: [ONGOING]
 
 ## ON-GOING TASKS:
 1. youtube_client.py -> adding `from_channel()` method to retrieve all videos under a channel.
-2. chunker.py -> started implementation.
+2. chunker.py -> on-going implementation.
 3. nmf.py -> started implementation.
 4. zero_shot.py -> started implementation. 
 
