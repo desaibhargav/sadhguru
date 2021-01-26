@@ -1,6 +1,8 @@
 # VR
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1oOJkErWRT3gNRAfG89wLk4Dijynthvwx?authuser=2#scrollTo=D-VzeDLptJLo)]
+
 
 Repository for Sadhguru video recommendation project
 
