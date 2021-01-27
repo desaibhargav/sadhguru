@@ -10,12 +10,11 @@ STATUS: [ONGOING]
 
 
 ## ON-GOING TASKS:
-1. backend/youtube_client.py -> adding `from_channel()` method to retrieve all videos under a channel.
-2. backend/recommend.py -> started implementation.
-3. frontend/app.py -> on-going implementation.
+1. backend/recommend.py -> seperate branch created (recommendation-pipeline).
+2. frontend/app.py -> started UI/UX.
 
 ## TO DO:
 1. Incorporate scrapped metadata like `likeCount`, `viewCount`, `dislikeCount` etc in addition to semantics in the recommendation pipeline.
-2. Consistent outputs (in schema) for `from_channel()` and `from_playlists()` methods in `youtube_client.py`.
-3. Update README.md (with basic usage, documentation and purpose of the project).
-4. **ADD. COMMENTS. EVERYWHERE. FFS!**
+2. Update README.md (with basic usage, documentation and purpose of the project).
+3. **ADD. COMMENTS. EVERYWHERE. FFS!**
+4. Trial
