@@ -17,3 +17,4 @@ STATUS: [ONGOING]
 1. Incorporate scrapped metadata like `likeCount`, `viewCount`, `dislikeCount` etc in addition to semantics in the recommendation pipeline.
 2. Update README.md (with basic usage, documentation and purpose of the project).
 3. **ADD. COMMENTS. EVERYWHERE. FFS!**
+4. Trial
