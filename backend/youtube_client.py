@@ -5,7 +5,7 @@ import time
 
 from itertools import chain
 from functools import reduce
-from typing import Union, Callable, Generator
+from typing import Union, Callable, Generator, Tuple
 from youtube_transcript_api import YouTubeTranscriptApi
 from tqdm import tqdm
 
@@ -103,6 +103,22 @@ class YouTubeClient:
         ], f"The argument 'how' should be one of [{'inner', 'outer'}]"
         return reduce(lambda x, y: pd.merge(x, y, on=on, how=how), list_of_dfs)
 
+    def _get_channel_upload_id(self, username: str) -> Tuple[str, str]:
+        response = self._execute_query(
+            query_kind="metadata",
+            query="channels().list",
+            part="contentDetails",
+            forUsername=username,
+        )
+        metadata = self._process_query(query_kind="metadata", response=response)
+        channel_id = metadata.id.to_list().pop()
+        channel_upload_id = (
+            metadata.contentDetails.apply(lambda x: x["relatedPlaylists"]["uploads"])
+            .to_list()
+            .pop()
+        )
+        return channel_id, channel_upload_id
+
     def _from_playlist_ids(self, *playlist_ids: Union[str, list]) -> pd.DataFrame:
         """"""
         extract_dict = {
@@ -195,8 +211,16 @@ class YouTubeClient:
 
     def from_playlist(self, *playlists: Union[str, list]) -> pd.DataFrame:
         """"""
+        is_url = (
+            lambda playlist: True
+            if playlist.startswith("https://www.youtube.com/watch?")
+            else False
+        )
         extract_playlist_id = lambda playlist: playlist[playlist.find("&list=") + 6 :]
-        playlist_ids = [extract_playlist_id(playlist) for playlist in playlists]
+        playlist_ids = [
+            extract_playlist_id(playlist) if is_url(playlist) else playlist
+            for playlist in playlists
+        ]
         playlist_metadata = self._from_playlist_ids(*playlist_ids)
         extract_dict = {
             "extract": ["playlistId", "videoId"],
@@ -253,4 +277,11 @@ class YouTubeClient:
                 "videoId",
             ]
         )
+        return dataset
+
+    def from_channel(self, username: str) -> pd.DataFrame:
+        """"""
+        channel_id, channel_upload_id = self._get_channel_upload_id(username=username)
+        print(f"Scrapping videos for username: {username} [channel ID: {channel_id}]")
+        dataset = self.from_playlist(channel_upload_id)
         return dataset
