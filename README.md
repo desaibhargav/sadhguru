@@ -14,6 +14,7 @@ STATUS: [ONGOING]
 2. frontend/app.py -> started UI/UX.
 
 ## TO DO:
-1. Incorporate scrapped metadata like `likeCount`, `viewCount`, `dislikeCount` etc in addition to semantics in the recommendation pipeline.
-2. Update README.md (with basic usage, documentation and purpose of the project).
-3. **ADD. COMMENTS. EVERYWHERE. FFS!**
+1. Incorporate scrapped metadata like `video_title`, `video_description` etc in addition to semantics in the recommendation pipeline.
+2. Add a preprocessing pipeline for text before connecting it to the recommendation pipeline.
+3. Update README.md (with basic usage, documentation and purpose of the project).
+4. **ADD. COMMENTS. EVERYWHERE. FFS!**
