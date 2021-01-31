@@ -1,7 +1,6 @@
 import pandas as pd
-import torch
 
-from typing import Optional, Tuple, List
+from typing import List
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 
 
@@ -10,7 +9,7 @@ class Recommender:
         self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
         self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
 
-    def fit(self, **corpus: List[str]) -> Optional[Tuple[List[str], torch.Tensor]]:
+    def fit(self, **corpus: List[str]):
         """
         fit the corpuses to be used for recommendations
         """
@@ -47,15 +46,23 @@ class Recommender:
                 hits[idx]["corpus_id"]
             ].replace("\n", " ")
         hits = sorted(hits, key=lambda x: x["cross-score"], reverse=True)
-        return hits
+        return pd.DataFrame(hits)
 
     def explore(self, query: str, top_k: int) -> pd.DataFrame:
         raise NotImplementedError
 
     @staticmethod
-    def format_for_frontend(df: pd.DataFrame):
-        raise NotImplementedError
-
-    @staticmethod
-    def format_for_web(df: pd.DataFrame):
-        raise NotImplementedError
+    def format_for_frontend(df: pd.DataFrame, hits: pd.DataFrame) -> pd.DataFrame:
+        video_id_hits = df.iloc[hits.corpus_id].index.get_level_values(level=0)
+        video_url_hits = [
+            f"https://www.youtube.com/watch?v={video_id}" for video_id in video_id_hits
+        ]
+        start_time = df.start_time.iloc[hits.corpus_id]
+        end_time = df.end_time.iloc[hits.corpus_id]
+        recommendations = pd.DataFrame(
+            {"url": video_url_hits, "start": start_time, "end": end_time}
+        ).sort_values("start")
+        recommendations = recommendations.groupby("url", as_index=False).agg(
+            {"start": "min", "end": "max"}
+        )
+        return recommendations
