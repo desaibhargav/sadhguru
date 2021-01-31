@@ -55,3 +55,7 @@ class Recommender:
     @staticmethod
     def format_for_frontend(df: pd.DataFrame):
         raise NotImplementedError
+
+    @staticmethod
+    def format_for_web(df: pd.DataFrame):
+        raise NotImplementedError
