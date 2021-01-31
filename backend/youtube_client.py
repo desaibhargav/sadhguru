@@ -1,3 +1,4 @@
+import operator
 import pandas as pd
 import numpy as np
 import googleapiclient.discovery
@@ -79,6 +80,12 @@ class YouTubeClient:
         self, df: pd.DataFrame, extract_dict: dict, clean_up: bool
     ) -> pd.DataFrame:
         """"""
+        target_columns = list(
+            map(
+                operator.itemgetter(0),
+                [[x] if not isinstance(x, list) else x for x in extract_dict["from"]],
+            )
+        )
         assert len(extract_dict.keys()) == 2 and extract_dict.keys() == {
             "extract",
             "from",
@@ -87,12 +94,18 @@ class YouTubeClient:
             extract_dict["from"]
         ), "Fields to be extracted are not equal to the columns specified"
         assert (
-            pd.Series(extract_dict["from"]).isin(df.columns).all()
+            pd.Series(target_columns).isin(df.columns).all()
         ), "Column(s) from which fields are to be extracted, do not exist in the passed pd.DataFrame object"
         for extract, from_column in zip(*extract_dict.values()):
-            df[extract] = df[from_column].apply(lambda x: x.get(extract, np.NaN))
+            if type(from_column) == list:
+                from_column.append(extract)
+                df[extract] = df[from_column[0]].apply(
+                    lambda x: reduce(operator.getitem, from_column[1:], x)
+                )
+            else:
+                df[extract] = df[from_column].apply(lambda x: x.get(extract, np.NaN))
         if clean_up:
-            df.drop(columns=list(set(extract_dict["from"])), inplace=True)
+            df.drop(columns=list(set(target_columns)), inplace=True)
         return df
 
     def _align(self, *list_of_dfs: pd.DataFrame, on: str, how: str) -> pd.DataFrame:
@@ -162,6 +175,7 @@ class YouTubeClient:
                 "description",
                 "title",
                 "tags",
+                "url",
                 "commentCount",
                 "dislikeCount",
                 "favoriteCount",
@@ -175,6 +189,7 @@ class YouTubeClient:
                 "snippet",
                 "snippet",
                 "snippet",
+                ["snippet", "thumbnails", "high"],
                 "statistics",
                 "statistics",
                 "statistics",
