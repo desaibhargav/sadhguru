@@ -98,9 +98,8 @@ class YouTubeClient:
         ), "Column(s) from which fields are to be extracted, do not exist in the passed pd.DataFrame object"
         for extract, from_column in zip(*extract_dict.values()):
             if type(from_column) == list:
-                from_column.append(extract)
                 df[extract] = df[from_column[0]].apply(
-                    lambda x: reduce(operator.getitem, from_column[1:], x)
+                    lambda x: reduce(operator.getitem, from_column[1:] + [extract], x)
                 )
             else:
                 df[extract] = df[from_column].apply(lambda x: x.get(extract, np.NaN))
