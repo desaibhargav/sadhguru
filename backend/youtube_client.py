@@ -25,7 +25,7 @@ class YouTubeClient:
         self.youtube_transcript_client = YouTubeTranscriptApi()
         self.state = {"units_consumed": 0, "daily_quota": 10000}
 
-    def _execute_query(self, query_kind: str, query: str, **query_params) -> list:
+    def _execute_query(self, query_kind: str, query: str, **query_params) -> Generator:
         """"""
         assert (
             query_kind == "metadata" or query_kind == "transcript"
