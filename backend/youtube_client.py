@@ -33,9 +33,11 @@ class YouTubeClient:
     Methods
     -------
     from_playlist(*playlists: Union[str, list]) -> pd.DataFrame
-        accepts a playlist or list of playlist URLs and returns a pd.DataFrame with metadata and transcripts (if found) for all vidoes in the playlist
+        accepts a playlist or list of playlist URLs and returns a pd.DataFrame with
+        metadata and transcripts (if found) for all vidoes in the playlist
     from_channel(username: str) -> pd.DataFrame
-        accepts a username and returns a pd.DataFrame with metadata and transcripts (if found) for all vidoes in the channel
+        accepts a username and returns a pd.DataFrame with metadata
+        and transcripts (if found) for all vidoes in the channel
     """
 
     def __init__(self, API_KEY: str):
@@ -46,8 +48,9 @@ class YouTubeClient:
 
         Parameters
         ----------
-        API_KEY: str
-            API_KEY to use for authenticating YouTube Data API. See https://developers.google.com/youtube/v3/getting-started for related info
+        API_KEY : str
+            API_KEY to use for authenticating YouTube Data API.
+            See https://developers.google.com/youtube/v3/getting-started for related info
         """
 
         self.__API_KEY = API_KEY
@@ -59,8 +62,35 @@ class YouTubeClient:
         self.youtube_transcript_client = YouTubeTranscriptApi()
         self.state = {"units_consumed": 0, "daily_quota": 10000}
 
-    def _execute_query(self, query_kind: str, query: str, **query_params) -> Generator:
-        """"""
+    def _execute_query(
+        self, query_kind: str, query: str, **query_params: Union[str, int]
+    ) -> Generator:
+        """
+        Executes a request made to Youtube Data API
+
+        Scrapes the complete response from the API (which is officialy limited to a maximum of 50 results)
+        by recursively posting the passed query until the nextToken value is null
+
+        Parameters
+        ----------
+        query_kind : str
+            the kind of query, can be one of ['metadata', 'transcript']
+        query : str
+            the query function call to be executed (without the closing paranthesis)
+        **query_params : Union[str, int]
+            the query parameters with which the query should be hit
+
+        Raises
+        ------
+        AssertionError
+            if query_kind is not one of ['metadata', 'transcript']
+
+        Returns
+        -------
+        response : Generator
+            returns a Generator object with the responses for the passed query
+        """
+
         assert (
             query_kind == "metadata" or query_kind == "transcript"
         ), f"'query_kind' must be one of ['metadata', 'transcript']"
