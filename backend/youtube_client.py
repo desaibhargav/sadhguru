@@ -39,6 +39,17 @@ class YouTubeClient:
     """
 
     def __init__(self, API_KEY: str):
+        """
+        Initialises the client using the API_KEY
+
+        The API_KEY is needed to sets up interfaces for retrieving video metadata and transcripts
+
+        Parameters
+        ----------
+        API_KEY: str
+            API_KEY to use for authenticating YouTube Data API. See https://developers.google.com/youtube/v3/getting-started for related info
+        """
+
         self.__API_KEY = API_KEY
         self._api_service_name = "youtube"
         self._api_version = "v3"
