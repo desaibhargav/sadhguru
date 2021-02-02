@@ -16,6 +16,6 @@ STATUS: [ONGOING]
 ## TO DO:
 1. Incorporate scrapped metadata like `video_title`, `video_description` etc in addition to semantics in the recommendation pipeline.
 2. Add a preprocessing pipeline for text before connecting it to the recommendation pipeline.
-3. Presentation
+3. Create some slides with figures and results to go along with the presentation.
 4. Update README.md (with basic usage, documentation and purpose of the project).
 5. **ADD. COMMENTS. EVERYWHERE. FFS!**
