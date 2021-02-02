@@ -11,7 +11,9 @@ STATUS: [ONGOING]
 
 ## ON-GOING TASKS:
 1. backend/recommend.py -> seperate branch created (recommendation-pipeline).
-2. frontend/app.py -> wireframe ready
+2. backend/youtube_client.py -> adding docstrings.
+3. frontend/app.py -> wireframe ready.
+
 
 ## TO DO:
 1. Incorporate scrapped metadata like `video_title`, `video_description` etc in addition to semantics in the recommendation pipeline.
