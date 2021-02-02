@@ -11,10 +11,11 @@ STATUS: [ONGOING]
 
 ## ON-GOING TASKS:
 1. backend/recommend.py -> seperate branch created (recommendation-pipeline).
-2. frontend/app.py -> started UI/UX.
+2. frontend/app.py -> wireframe ready
 
 ## TO DO:
 1. Incorporate scrapped metadata like `video_title`, `video_description` etc in addition to semantics in the recommendation pipeline.
 2. Add a preprocessing pipeline for text before connecting it to the recommendation pipeline.
-3. Update README.md (with basic usage, documentation and purpose of the project).
-4. **ADD. COMMENTS. EVERYWHERE. FFS!**
+3. Presentation
+4. Update README.md (with basic usage, documentation and purpose of the project).
+5. **ADD. COMMENTS. EVERYWHERE. FFS!**
