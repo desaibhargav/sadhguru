@@ -13,7 +13,29 @@ from tqdm import tqdm
 
 class YouTubeClient:
     """
-    Only to scrape data. Not to upload or delete videos.
+    A utility class to scrape data from YouTube channels/playlists/videos and return a pd.DataFrame object.
+
+    Attributes
+    ----------
+    __API_KEY : str
+        private key used to access the YouTube Data API
+    _api_service_name : str
+        used to build the interface of the YouTube Data API, specifies service name.
+    _api_version: str
+        used to build the interface of the YouTube Data API, specifies API verison
+    youtube_metadata_client : googleapiclient.discovery.build
+        the interface used to hit queries for YouTube metadata
+    youtube_transcript_client: YouTubeTranscriptApi
+        the interface used to hit queries for YouTube video transcripts
+    state : dict
+        keeps a track of quota remaining for the account associated with the passed __API_KEY
+
+    Methods
+    -------
+    from_playlist(*playlists: Union[str, list]) -> pd.DataFrame
+        accepts a playlist or list of playlist URLs and returns a pd.DataFrame with metadata and transcripts (if found) for all vidoes in the playlist
+    from_channel(username: str) -> pd.DataFrame
+        accepts a username and returns a pd.DataFrame with metadata and transcripts (if found) for all vidoes in the channel
     """
 
     def __init__(self, API_KEY: str):
