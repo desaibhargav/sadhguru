@@ -58,11 +58,12 @@ def search_pipeline(recommender: Recommender, df: pd.DataFrame):
         "Enter your question here", "How to make big decisions in life?"
     )
     if st.button("Search"):
-        hits = recommender.search(question=question, corpus="blocks", top_k=200)
-        recommendations = recommender.format_for_frontend(df, hits)
-        render_recommendations_grid(recommendations, columns=3, rows=3)
-        st.dataframe(recommendations)
-        st.dataframe(hits)
+        with st.spinner("Searching the database"):
+            hits = recommender.search(question=question, corpus="blocks", top_k=200)
+            recommendations = recommender.format_for_frontend(df, hits)
+            render_recommendations_grid(recommendations, columns=3, rows=3)
+            st.dataframe(recommendations)
+            st.dataframe(hits)
 
 
 def explore_pipeline():
