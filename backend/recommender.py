@@ -58,16 +58,17 @@ class Recommender:
 
     @staticmethod
     def format_for_frontend(df: pd.DataFrame, hits: pd.DataFrame) -> pd.DataFrame:
-        video_id_hits = df.iloc[hits.corpus_id].index.get_level_values(level=0)
-        video_url_hits = [
-            f"https://www.youtube.com/watch?v={video_id}" for video_id in video_id_hits
-        ]
-        start_time = df.start_time.iloc[hits.corpus_id]
-        end_time = df.end_time.iloc[hits.corpus_id]
-        recommendations = pd.DataFrame(
-            {"url": video_url_hits, "start": start_time, "end": end_time}
+        hits = hits.loc[hits["cross-score"] >= 0.25]
+        hits = hits.assign(
+            video_link=hits.corpus_id.apply(
+                lambda x: f"https://www.youtube.com/watch?v={df.index.get_level_values(0)[x]}"
+            ),
+            start=hits.corpus_id.apply(lambda x: df.start_time.iloc[x]),
+            end=hits.corpus_id.apply(lambda x: df.end_time.iloc[x]),
         ).sort_values("start")
-        recommendations = recommendations.groupby("url", as_index=False).agg(
-            {"start": "min", "end": "max"}
+        recommendations = (
+            hits.groupby("video_link", as_index=False)
+            .agg({"start": "min", "end": "max", "cross-score": "max"})
+            .sort_values("cross-score", ascending=False)
         )
         return recommendations
