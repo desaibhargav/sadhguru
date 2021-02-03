@@ -14,6 +14,7 @@ def main():
 
     # set the title
     st.title("Ask Sadhguru")
+    readme_text = st.markdown(open(os.path.join(os.getcwd(), "README.md")).read())
 
     # create the database
     if not isinstance(state["database"], pd.DataFrame):
@@ -55,9 +56,11 @@ def main():
     if app_mode == "Show instructions":
         st.sidebar.success("Pulling up the instruction page")
     elif app_mode == "Search":
+        readme_text.empty()
         st.sidebar.success("Search selected")
         search_pipeline(state["recommender"], state["database"])
     elif app_mode == "Explore":
+        readme_text.empty()
         st.sidebar.success("Explore selected")
         explore_pipeline()
 
