@@ -12,7 +12,7 @@ class Recommender:
         self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
         self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
 
-    def fit(self, save_state, **corpus: List[str]):
+    def fit(self, save_state: bool, **corpus: List[str]):
         """
         fit the corpuses to be used for recommendations
         """
