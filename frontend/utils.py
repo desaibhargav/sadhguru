@@ -11,7 +11,7 @@ from backend.recommender import Recommender
 from backend.utils import save_to_cache
 
 
-def create_database(file: str, save_state: str) -> pd.DataFrame:
+def create_database(file: str, save_state: bool) -> pd.DataFrame:
     """"""
     assert isinstance(
         file, str
