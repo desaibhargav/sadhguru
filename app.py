@@ -68,7 +68,7 @@ def load_database(file: str) -> pd.DataFrame:
     return create_database(file, save_state=True)
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True, show_spinner=True)
 def app_state() -> dict:
     state = {"recommender": False, "database": False}
     return state
