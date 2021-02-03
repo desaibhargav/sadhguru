@@ -3,6 +3,7 @@ import pickle
 import os
 
 from typing import List
+from backend.utils import save_to_cache
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 
 
@@ -11,7 +12,7 @@ class Recommender:
         self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
         self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
 
-    def fit(self, save_to_disk=True, **corpus: List[str]):
+    def fit(self, save_state, **corpus: List[str]):
         """
         fit the corpuses to be used for recommendations
         """
@@ -22,15 +23,8 @@ class Recommender:
             )
             for key, value in corpus.items()
         }
-        if save_to_disk:
-            with open(
-                os.path.join(os.getcwd(), "datasets", "encodings.pickle"), "wb"
-            ) as output:
-                pickle.dump(
-                    [self.corpus_dict, self.corpus_embeddings_dict],
-                    output,
-                    pickle.HIGHEST_PROTOCOL,
-                )
+        if save_state:
+            save_to_cache("recommender", self)
 
     def search(self, question: str, corpus: str, top_k: int) -> pd.DataFrame:
         """

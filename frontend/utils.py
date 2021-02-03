@@ -1,15 +1,17 @@
 import sys
+import os
 import pandas as pd
 import pickle
 import numpy as np
-import torch
+import streamlit as st
 
 from typing import Union, Optional, Tuple, List
-from sentence_transformers import SentenceTransformer, CrossEncoder, util
 from backend.chunker import Chunker
+from backend.recommender import Recommender
+from backend.utils import save_to_cache
 
 
-def create_database(file: str) -> pd.DataFrame:
+def create_database(file: str, save_state: str) -> pd.DataFrame:
     """"""
     assert isinstance(
         file, str
@@ -22,14 +24,63 @@ def create_database(file: str) -> pd.DataFrame:
         database_chunked = database.join(chunked).drop(
             columns=["subtitles", "timestamps"]
         )
-        return database_chunked.dropna()
+        if save_state:
+            save_to_cache("database", database_chunked)
+        return database_chunked
     except pickle.UnpicklingError:
         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
 
 
-def search_pipeline():
+def search_pipeline(recommender: Recommender, df: pd.DataFrame):
+    st.header("Search")
+    question = st.text_area(
+        "Enter your question here", "How to make big decisions in life?"
+    )
+    if st.button("Search"):
+        hits = recommender.search(question=question, corpus="blocks", top_k=9)
+        recommendations = recommender.format_for_frontend(df, hits)
+        st.dataframe(recommendations)
+
+
+def explore_pipeline():
     raise NotImplementedError
 
 
-def execute_pipline():
-    raise NotImplementedError
+# st.title("Ask Sadhguru")
+# st.header("Search")
+# question = st.text_area(
+#     "Enter your question here", "How to make big decisions in life?"
+# )
+# search = st.beta_expander("Recommmendations", expanded=False)
+# with search:
+#     for i in range(1, 3):
+#         col1, col2, col3 = st.beta_columns(3)
+#         with col1:
+#             st.header("Video 1")
+#             st.video("https://www.youtube.com/watch?v=-2IcOOUqNgI", start_time=8)
+
+#         with col2:
+#             st.header("Video 2")
+#             st.video("https://www.youtube.com/watch?v=-3rzessN6cI", start_time=6)
+
+#         with col3:
+#             st.header("Video 3")
+#             st.video("https://www.youtube.com/watch?v=-46JXxFlXoA", start_time=92)
+
+# st.header("Explore")
+# question = st.text_input("Search here", "Sadhguru on Coronavirus pandemic")
+# explore = st.beta_expander("Recommmendations", expanded=False)
+# with explore:
+#     for i in range(1, 3):
+#         col1, col2, col3 = st.beta_columns(3)
+#         with col1:
+#             st.header("Video 1")
+#             st.video("https://www.youtube.com/watch?v=-2IcOOUqNgI", start_time=8)
+
+#         with col2:
+#             st.header("Video 2")
+#             st.video("https://www.youtube.com/watch?v=-3rzessN6cI", start_time=6)
+
+#         with col3:
+#             st.header("Video 3")
+#             st.video("https://www.youtube.com/watch?v=-46JXxFlXoA", start_time=92)
