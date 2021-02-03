@@ -5,7 +5,6 @@ import pickle
 import numpy as np
 import streamlit as st
 
-from typing import Union, Optional, Tuple, List
 from backend.chunker import Chunker
 from backend.recommender import Recommender
 from backend.utils import save_to_cache
@@ -32,21 +31,22 @@ def create_database(file: str, save_state: bool) -> pd.DataFrame:
         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
 
 
-def render_recommendations_grid(
-    hits: pd.DataFrame, recommendations: pd.DataFrame, **grid_specs: int
-):
+def render_recommendations_grid(recommendations: pd.DataFrame, **grid_specs: int):
     expander = st.beta_expander("Recommmendations", expanded=True)
+    rows = min(
+        int(len(recommendations) / grid_specs.get("rows", 3)), len(recommendations)
+    )
     with expander:
         grid_pointer = 0
-        for row in range(grid_specs.get("rows", 3)):
+        for row in range(rows):
             columns = st.beta_columns(grid_specs.get("columns", 3))
             for column in columns:
                 with column:
                     st.header(
-                        f"{round(hits['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
+                        f"{round(recommendations['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
                     )
                     st.video(
-                        recommendations["url"].iloc[grid_pointer],
+                        recommendations["video_link"].iloc[grid_pointer],
                         start_time=int(recommendations["start"].iloc[grid_pointer]),
                     )
                     grid_pointer += 1
@@ -60,7 +60,9 @@ def search_pipeline(recommender: Recommender, df: pd.DataFrame):
     if st.button("Search"):
         hits = recommender.search(question=question, corpus="blocks", top_k=200)
         recommendations = recommender.format_for_frontend(df, hits)
-        render_recommendations_grid(hits, recommendations, columns=3, rows=3)
+        render_recommendations_grid(recommendations, columns=3, rows=3)
+        st.dataframe(recommendations)
+        st.dataframe(hits)
 
 
 def explore_pipeline():
