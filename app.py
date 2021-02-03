@@ -27,7 +27,8 @@ def main():
                     os.getcwd(),
                     "datasets",
                     "youtube_scrapped_complete_protocol5.pickle",
-                )
+                ),
+                save_state=True,
             )
         state["database"] = df
 
@@ -41,9 +42,9 @@ def main():
         else:
             recommender = Recommender()
             recommender.fit(
-                blocks=state["database"].block[:10].to_list(),
-                video_titles=state["database"].video_title.unique()[:10],
-                video_descriptions=state["database"].video_description.unique()[:10],
+                blocks=state["database"].block.to_list(),
+                video_titles=state["database"].video_title.unique(),
+                video_descriptions=state["database"].video_description.unique(),
                 save_state=True,
             )
         state["recommender"] = recommender
@@ -66,9 +67,9 @@ def main():
 
 
 @st.cache(allow_output_mutation=True, show_spinner=True)
-def load_database(file: str) -> pd.DataFrame:
+def load_database(file: str, save_state: bool) -> pd.DataFrame:
     """"""
-    return create_database(file, save_state=True)
+    return create_database(file, save_state=save_state)
 
 
 @st.cache(allow_output_mutation=True, show_spinner=True)
