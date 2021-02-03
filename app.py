@@ -8,6 +8,12 @@ from backend.recommender import Recommender
 
 
 def main():
+    # set page config
+    st.set_page_config(
+        page_title="Ask Sadhguru",
+        layout="centered",
+        initial_sidebar_state="expanded",
+    )
     # set some variables
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
     state = app_state()
