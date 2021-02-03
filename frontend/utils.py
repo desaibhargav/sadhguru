@@ -31,6 +31,26 @@ def create_database(file: str, save_state: str) -> pd.DataFrame:
         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
 
 
+def render_recommendations_grid(
+    hits: pd.DataFrame, recommendations: pd.DataFrame, **grid_specs: int
+):
+    expander = st.beta_expander("Recommmendations", expanded=True)
+    with expander:
+        grid_pointer = 0
+        for row in range(grid_specs.get("rows", 3)):
+            columns = st.beta_columns(grid_specs.get("columns", 3))
+            for column in columns:
+                with column:
+                    st.header(
+                        f"{round(hits['cross-score'].iloc[grid_pointer], 2)} :heart:"
+                    )
+                    st.video(
+                        recommendations["url"].iloc[grid_pointer],
+                        start_time=int(recommendations["start"].iloc[grid_pointer]),
+                    )
+                    grid_pointer += 1
+
+
 def search_pipeline(recommender: Recommender, df: pd.DataFrame):
     st.header("Search")
     question = st.text_area(
@@ -39,7 +59,7 @@ def search_pipeline(recommender: Recommender, df: pd.DataFrame):
     if st.button("Search"):
         hits = recommender.search(question=question, corpus="blocks", top_k=9)
         recommendations = recommender.format_for_frontend(df, hits)
-        st.dataframe(recommendations)
+        render_recommendations_grid(hits, recommendations, columns=3, rows=3)
 
 
 def explore_pipeline():
