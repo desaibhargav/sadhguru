@@ -25,3 +25,11 @@ def create_database(file: str) -> pd.DataFrame:
         return database_chunked.dropna()
     except pickle.UnpicklingError:
         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
+
+
+def search_pipeline():
+    raise NotImplementedError
+
+
+def execute_pipline():
+    raise NotImplementedError
