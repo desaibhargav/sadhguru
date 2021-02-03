@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import pickle
 import numpy as np
@@ -23,4 +24,4 @@ def create_dataset(file: str) -> pd.DataFrame:
         )
         df = dataset_chunked.copy().dropna()
     except pickle.UnpicklingError:
-        print("The passed file does not point to a pickled pd.DataFrame object")
+        sys.exit("The passed file does not point to a pickled pd.DataFrame object")
