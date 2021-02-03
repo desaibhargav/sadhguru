@@ -4,7 +4,7 @@ import pickle
 import sys
 import os
 
-from frontend.utils import create_dataset
+from frontend.utils import create_database
 from backend.chunker import Chunker
 from backend.recommender import Recommender
 
@@ -91,22 +91,9 @@ def main():
 
 
 @st.cache
-def create_database(file: str) -> pd.DataFrame:
+def load_database(file: str) -> pd.DataFrame:
     """"""
-    assert isinstance(
-        file, str
-    ), "please pass the path to a pickled pd.DataFrame object"
-    try:
-        dataset = pd.read_pickle(file)
-        chunked = Chunker(
-            chunk_by="length", expected_threshold=100, min_tolerable_threshold=75
-        ).get_chunks(dataset)
-        dataset_chunked = dataset.join(chunked).drop(
-            columns=["subtitles", "timestamps"]
-        )
-        df = dataset_chunked.copy().dropna()
-    except pickle.UnpicklingError:
-        sys.exit("The passed file does not point to a pickled pd.DataFrame object")
+    return create_database(file)
 
 
 @st.cache
@@ -122,3 +109,7 @@ def fit(df: pd.DataFrame, recommender: Recommender) -> Recommender:
         video_descriptions=df.video_description.unique()[:10],
     )
     return recommender
+
+
+if __name__ == "__main__":
+    main()
