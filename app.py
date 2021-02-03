@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
-import sys
 import os
 
 from frontend.utils import create_database, search_pipeline, explore_pipeline
