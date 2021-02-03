@@ -24,6 +24,7 @@ def create_database(file: str, save_state: bool) -> pd.DataFrame:
         database_chunked = database.join(chunked).drop(
             columns=["subtitles", "timestamps"]
         )
+        database_chunked.dropna(inplace=True)
         if save_state:
             save_to_cache("database", database_chunked)
         return database_chunked
@@ -42,7 +43,7 @@ def render_recommendations_grid(
             for column in columns:
                 with column:
                     st.header(
-                        f"{round(hits['cross-score'].iloc[grid_pointer], 2)} :heart:"
+                        f"{round(hits['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
                     )
                     st.video(
                         recommendations["url"].iloc[grid_pointer],
@@ -57,7 +58,7 @@ def search_pipeline(recommender: Recommender, df: pd.DataFrame):
         "Enter your question here", "How to make big decisions in life?"
     )
     if st.button("Search"):
-        hits = recommender.search(question=question, corpus="blocks", top_k=9)
+        hits = recommender.search(question=question, corpus="blocks", top_k=200)
         recommendations = recommender.format_for_frontend(df, hits)
         render_recommendations_grid(hits, recommendations, columns=3, rows=3)
 
