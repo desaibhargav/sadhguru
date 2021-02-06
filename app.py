@@ -71,11 +71,11 @@ def main():
     elif app_mode == "Search":
         readme_text.empty()
         st.sidebar.success("Search selected")
-        search_pipeline(state["recommender"], state["database"])
+        search_pipeline(state["recommender"])
     elif app_mode == "Explore":
         readme_text.empty()
         st.sidebar.success("Explore selected")
-        explore_pipeline()
+        explore_pipeline(state["recommender"])
 
 
 @st.cache(allow_output_mutation=True, show_spinner=True)
