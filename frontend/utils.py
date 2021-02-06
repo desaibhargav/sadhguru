@@ -31,7 +31,9 @@ def create_database(file: str, save_state: bool) -> pd.DataFrame:
         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
 
 
-def render_recommendations_grid(recommendations: pd.DataFrame, **grid_specs: int):
+def render_recommendations_grid(
+    recommendations: pd.DataFrame, mode: str, **grid_specs: int
+):
     expander = st.beta_expander("Recommmendations", expanded=True)
     rows = min(
         int(len(recommendations) / grid_specs.get("rows", 3)), len(recommendations)
@@ -42,14 +44,20 @@ def render_recommendations_grid(recommendations: pd.DataFrame, **grid_specs: int
             columns = st.beta_columns(grid_specs.get("columns", 3))
             for column in columns:
                 with column:
-                    st.header(
-                        f"{round(recommendations['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
-                    )
-                    st.video(
-                        recommendations["video_link"].iloc[grid_pointer],
-                        start_time=int(recommendations["start"].iloc[grid_pointer]),
-                    )
-                    grid_pointer += 1
+                    if mode == "search":
+                        st.header(
+                            f"{round(recommendations['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
+                        )
+                        st.video(
+                            recommendations["video_link"].iloc[grid_pointer],
+                            start_time=int(recommendations["start"].iloc[grid_pointer]),
+                        )
+                    else:
+                        st.header(
+                            f"{recommendations['video_title'].iloc[grid_pointer]}"
+                        )
+                        st.video(recommendations["video_link"].iloc[grid_pointer])
+                grid_pointer += 1
 
 
 def search_pipeline(recommender: Recommender, df: pd.DataFrame):
@@ -61,12 +69,28 @@ def search_pipeline(recommender: Recommender, df: pd.DataFrame):
         with st.spinner("Searching the database"):
             hits = recommender.search(question=question, corpus="blocks", top_k=200)
             recommendations = recommender.format_for_frontend(df, hits)
-            render_recommendations_grid(recommendations, columns=3, rows=3)
+            render_recommendations_grid(
+                recommendations, mode="search", columns=3, rows=3
+            )
             st.dataframe(recommendations)
             st.dataframe(hits)
 
 
-def explore_pipeline():
+def explore_pipeline(recommender: Recommender):
+    st.header("Explore")
+    query = st.text_input("Search here", "love and relationships")
+    if st.button("Explore"):
+        with st.spinner("Searching the database"):
+            hits, recommendations = recommender.explore(
+                query=query, corpus=["video_title", "video_description"], top_k=10
+            )
+            # recommendations = recommender.format_for_frontend(df, hits)
+            render_recommendations_grid(
+                recommendations, mode="explore", columns=3, rows=3
+            )
+            st.dataframe(recommendations)
+            st.dataframe(hits)
+
     raise NotImplementedError
 
 
