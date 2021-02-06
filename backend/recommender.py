@@ -59,6 +59,9 @@ class Recommender:
         # sort results by the cross-encoder scores
         for idx in range(len(cross_scores)):
             hits[idx]["cross-score"] = cross_scores[idx]
+            hits[idx]["snippet"] = self.corpus[corpus][hits[idx]["corpus_id"]].replace(
+                "\n", " "
+            )
 
         # return hits and recommendations
         hits = (
