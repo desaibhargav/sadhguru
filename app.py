@@ -2,7 +2,12 @@ import streamlit as st
 import pandas as pd
 import os
 
-from frontend.utils import create_database, search_pipeline, explore_pipeline
+from frontend.utils import (
+    create_database,
+    search_pipeline,
+    explore_pipeline,
+    process_pipeline,
+)
 from backend.utils import load_from_cache
 from backend.recommender import Recommender
 
@@ -20,7 +25,6 @@ def main():
 
     # set the title
     st.title("Ask Sadhguru")
-    readme_text = st.markdown(open(os.path.join(os.getcwd(), "README.md")).read())
 
     # create the database
     if not isinstance(state["database"], pd.DataFrame):
@@ -58,16 +62,15 @@ def main():
     # once we have the dependencies, add a selector for the app mode on the sidebar.
     st.sidebar.title("Menu")
     app_mode = st.sidebar.selectbox(
-        "Choose the app mode", ["Show instructions", "Search", "Explore"]
+        "Choose the app mode", ["How does it work?", "Search", "Explore"]
     )
-    if app_mode == "Show instructions":
+    if app_mode == "How does it work?":
         st.sidebar.success("Pulling up the instruction page")
+        process_pipeline(state["database"])
     elif app_mode == "Search":
-        readme_text.empty()
         st.sidebar.success("Search selected")
         search_pipeline(state["recommender"])
     elif app_mode == "Explore":
-        readme_text.empty()
         st.sidebar.success("Explore selected")
         explore_pipeline(state["recommender"])
 
