@@ -24,6 +24,14 @@ def create_database(file: str, save_state: bool) -> pd.DataFrame:
             columns=["subtitles", "timestamps"]
         )
         database_chunked.dropna(inplace=True)
+        database_chunked = database_chunked.assign(
+            video_description=database_chunked["video_description"]
+            .str.strip()
+            .str.split("\n\n")
+            .str[0],
+            video_title=database_chunked["video_title"].str.strip(),
+        )
+        database_chunked = database_chunked.drop_duplicates(subset="block")
         if save_state:
             save_to_cache("database", database_chunked)
         return database_chunked
