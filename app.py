@@ -53,12 +53,6 @@ def main():
                     columns=["block", "video_title", "video_description"],
                     save_state=True,
                 )
-            # recommender.fit(
-            #     blocks=state["database"].block.to_list(),
-            #     video_titles=state["database"].video_title.unique(),
-            #     video_descriptions=state["database"].video_description.unique(),
-            #     save_state=True,
-            # )
         state["recommender"] = recommender
 
     # once we have the dependencies, add a selector for the app mode on the sidebar.
