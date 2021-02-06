@@ -50,7 +50,7 @@ def main():
             recommender.fit(
                 corpus=state["database"],
                 columns=["block", "video_title", "video_description"],
-                save_state=False,
+                save_state=True,
             )
             # recommender.fit(
             #     blocks=state["database"].block.to_list(),
