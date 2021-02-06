@@ -46,12 +46,13 @@ def main():
         if os.path.isfile(recommender_cache_path):
             recommender = load_from_cache("recommender")
         else:
-            recommender = Recommender()
-            recommender.fit(
-                corpus=state["database"],
-                columns=["block", "video_title", "video_description"],
-                save_state=True,
-            )
+            with st.spinner("Fitting the database"):
+                recommender = Recommender()
+                recommender.fit(
+                    corpus=state["database"],
+                    columns=["block", "video_title", "video_description"],
+                    save_state=True,
+                )
             # recommender.fit(
             #     blocks=state["database"].block.to_list(),
             #     video_titles=state["database"].video_title.unique(),
