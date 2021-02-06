@@ -71,7 +71,8 @@ def render_recommendations_grid(
 def search_pipeline(recommender: Recommender):
     st.header("Search")
     question = st.text_area(
-        "Enter your question here", "How to make big decisions in life?"
+        "Enter your question here",
+        "How to be confident while taking big decisions in life?",
     )
     if st.button("Search"):
         with st.spinner("Searching the database"):
