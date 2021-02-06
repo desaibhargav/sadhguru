@@ -75,7 +75,7 @@ def search_pipeline(recommender: Recommender, df: pd.DataFrame):
     )
     if st.button("Search"):
         with st.spinner("Searching the database"):
-            hits = recommender.search(question=question, corpus="blocks", top_k=200)
+            hits = recommender.search(question=question, corpus="block", top_k=200)
             recommendations = recommender.format_for_frontend(df, hits)
             render_recommendations_grid(
                 recommendations, mode="search", columns=3, rows=3
