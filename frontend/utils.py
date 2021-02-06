@@ -91,8 +91,6 @@ def explore_pipeline(recommender: Recommender):
             st.dataframe(recommendations)
             st.dataframe(hits)
 
-    raise NotImplementedError
-
 
 # st.title("Ask Sadhguru")
 # st.header("Search")
