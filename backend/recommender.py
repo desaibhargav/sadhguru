@@ -52,7 +52,7 @@ class Recommender:
         question_embedding = self._encode(question, verbosity=False)
         hits = self._semamtic_search(question_embedding, corpus, top_k)
 
-        # now, score all retrieved passages with the cross_encoder
+        # score all retrieved passages with the cross_encoder
         cross_inp = [[question, self.corpus[corpus][hit["corpus_id"]]] for hit in hits]
         cross_scores = self.cross_encoder.predict(cross_inp)
 
@@ -85,6 +85,7 @@ class Recommender:
         self, query: str, corpus: List[str], top_k: int
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         assert all(corpus_str in self.corpus_embeddings_dict for corpus_str in corpus)
+        question_embedding = self._encode(query, verbosity=False)
 
         # get hits
         question_embedding = self._encode(query, verbosity=False)
