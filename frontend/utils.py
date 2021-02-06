@@ -5,6 +5,7 @@ import pickle
 import numpy as np
 import streamlit as st
 
+from pathlib import Path
 from backend.chunker import Chunker
 from backend.recommender import Recommender
 from backend.utils import save_to_cache
@@ -103,41 +104,49 @@ def explore_pipeline(recommender: Recommender):
             st.dataframe(hits)
 
 
-# st.title("Ask Sadhguru")
-# st.header("Search")
-# question = st.text_area(
-#     "Enter your question here", "How to make big decisions in life?"
-# )
-# search = st.beta_expander("Recommmendations", expanded=False)
-# with search:
-#     for i in range(1, 3):
-#         col1, col2, col3 = st.beta_columns(3)
-#         with col1:
-#             st.header("Video 1")
-#             st.video("https://www.youtube.com/watch?v=-2IcOOUqNgI", start_time=8)
+def process_pipeline(database: pd.DataFrame):
+    data_expander = st.beta_expander("What was the data used?", expanded=True)
+    with data_expander:
+        raw_dataset = pd.read_pickle(
+            os.path.join(
+                os.getcwd(), "datasets", "youtube_scrapped_complete_protocol5.pickle"
+            )
+        )
+        raw_dataset.subtitles = raw_dataset.subtitles.apply(
+            lambda x: np.NaN if isinstance(x[0], float) else x
+        )
+        st.write(
+            "The data collected from the channel using `youtube_client.py` is shown below:"
+        )
+        st.dataframe(
+            raw_dataset.droplevel(level=[0, 1, 2, 3]).dropna().reset_index().head()
+        )
+        st.write(
+            "The subtitle for each video is broken down into blocks of fixed length using `chunker.py`, the data that results looks like:"
+        )
+        st.dataframe(database.droplevel(level=[1, 2, 3, 4]).reset_index().head())
+        data_markdown = Path(
+            os.path.join(os.getcwd(), "frontend", "what_data_do_we_use.md")
+        ).read_text()
+        st.markdown(data_markdown, unsafe_allow_html=True)
+    search_expander = st.beta_expander("How does Search work?", expanded=False)
+    with search_expander:
+        data_markdown = Path(
+            os.path.join(os.getcwd(), "frontend", "how_does_search_work.md")
+        ).read_text()
+        st.markdown(data_markdown, unsafe_allow_html=True)
+    explore_expander = st.beta_expander("How does Explore work?", expanded=False)
+    with explore_expander:
+        data_markdown = Path(
+            os.path.join(os.getcwd(), "frontend", "how_does_explore_work.md")
+        ).read_text()
+        st.markdown(data_markdown, unsafe_allow_html=True)
+    model_expander = st.beta_expander("What were the models used?", expanded=False)
+    with model_expander:
+        data_markdown = Path(
+            os.path.join(os.getcwd(), "frontend", "what_were_the_models_used.md")
+        ).read_text()
+        st.markdown(data_markdown, unsafe_allow_html=True)
 
-#         with col2:
-#             st.header("Video 2")
-#             st.video("https://www.youtube.com/watch?v=-3rzessN6cI", start_time=6)
-
-#         with col3:
-#             st.header("Video 3")
-#             st.video("https://www.youtube.com/watch?v=-46JXxFlXoA", start_time=92)
-
-# st.header("Explore")
-# question = st.text_input("Search here", "Sadhguru on Coronavirus pandemic")
-# explore = st.beta_expander("Recommmendations", expanded=False)
-# with explore:
-#     for i in range(1, 3):
-#         col1, col2, col3 = st.beta_columns(3)
-#         with col1:
-#             st.header("Video 1")
-#             st.video("https://www.youtube.com/watch?v=-2IcOOUqNgI", start_time=8)
-
-#         with col2:
-#             st.header("Video 2")
-#             st.video("https://www.youtube.com/watch?v=-3rzessN6cI", start_time=6)
-
-#         with col3:
-#             st.header("Video 3")
-#             st.video("https://www.youtube.com/watch?v=-46JXxFlXoA", start_time=92)
+    # st.markdown(open(os.path.join(os.getcwd(), "README.md")).read())
+    # raise NotImplementedError
