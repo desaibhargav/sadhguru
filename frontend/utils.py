@@ -44,7 +44,7 @@ def render_recommendations_grid(
 ):
     expander = st.beta_expander("Recommmendations", expanded=True)
     rows = min(
-        int(len(recommendations) / grid_specs.get("rows", 3)), len(recommendations)
+        int(len(recommendations) / grid_specs.get("rows", 3)), grid_specs.get("rows", 3)
     )
     with expander:
         grid_pointer = 0
@@ -61,22 +61,24 @@ def render_recommendations_grid(
                             start_time=int(recommendations["start"].iloc[grid_pointer]),
                         )
                     else:
-                        st.header(
-                            f"{recommendations['video_title'].iloc[grid_pointer]}"
+                        st.subheader(
+                            f"{recommendations['video_title'].iloc[grid_pointer][:30]}..."
                         )
                         st.video(recommendations["video_link"].iloc[grid_pointer])
                 grid_pointer += 1
 
 
-def search_pipeline(recommender: Recommender, df: pd.DataFrame):
+def search_pipeline(recommender: Recommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here", "How to make big decisions in life?"
     )
     if st.button("Search"):
         with st.spinner("Searching the database"):
-            hits = recommender.search(question=question, corpus="block", top_k=200)
-            recommendations = recommender.format_for_frontend(df, hits)
+            hits, recommendations = recommender.search(
+                question=question, corpus="block", top_k=200
+            )
+            # recommendations = recommender.format_for_frontend(df, hits)
             render_recommendations_grid(
                 recommendations, mode="search", columns=3, rows=3
             )
