@@ -84,6 +84,8 @@ class Recommender:
     def explore(
         self, query: str, corpus: List[str], top_k: int
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        assert all(corpus_str in self.corpus_embeddings_dict for corpus_str in corpus)
+
         # get hits
         question_embedding = self._encode(query, verbosity=False)
         hits = pd.concat(
