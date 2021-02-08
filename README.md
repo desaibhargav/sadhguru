@@ -2,6 +2,8 @@
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1oOJkErWRT3gNRAfG89wLk4Dijynthvwx?usp=sharing)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/desaibhargav/VR/AskSadhguru/)
+
 
 
 Repository for Sadhguru video recommendation project
