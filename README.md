@@ -6,7 +6,7 @@
 
 Repository for Sadhguru video recommendation project
 
-STATUS: [POC]
+STATUS: [POC READY]
 
 
 ## ON-GOING TASKS:
@@ -16,4 +16,5 @@ STATUS: [POC]
 
 ## TO DO:
 1. Update README.md (with basic usage, documentation and purpose of the project).
-2. **ADD. COMMENTS. EVERYWHERE. FFS!**
+2. Take it from POC to PROD [using `FastAPI` x `Streamlit`]
+3. **ADD. COMMENTS. EVERYWHERE. FFS!**
