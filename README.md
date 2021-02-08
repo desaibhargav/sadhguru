@@ -6,18 +6,14 @@
 
 Repository for Sadhguru video recommendation project
 
-STATUS: [ONGOING]
+STATUS: [POC]
 
 
 ## ON-GOING TASKS:
-1. backend/recommend.py -> seperate branch created (recommendation-pipeline).
-2. backend/youtube_client.py -> adding docstrings.
-3. frontend/app.py -> wireframe ready.
+1. frontend/how_does_explore_work.md -> add diagram to simplify understanding.
+2. frontend/how_does_search_work.md -> add diagram to simplify understanding.
 
 
 ## TO DO:
-1. Incorporate scrapped metadata like `video_title`, `video_description` etc in addition to semantics in the recommendation pipeline.
-2. Add a preprocessing pipeline for text before connecting it to the recommendation pipeline.
-3. Create some slides with figures and results to go along with the presentation.
-4. Update README.md (with basic usage, documentation and purpose of the project).
-5. **ADD. COMMENTS. EVERYWHERE. FFS!**
+1. Update README.md (with basic usage, documentation and purpose of the project).
+2. **ADD. COMMENTS. EVERYWHERE. FFS!**
