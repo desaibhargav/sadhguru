@@ -65,7 +65,7 @@ def main():
         "Choose the app mode", ["How does it work?", "Search", "Explore"]
     )
     if app_mode == "How does it work?":
-        st.sidebar.success("Pulling up the instruction page")
+        st.sidebar.success("Pulling up the home page")
         process_pipeline(state["database"])
     elif app_mode == "Search":
         st.sidebar.success("Search selected")
