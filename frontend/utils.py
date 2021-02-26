@@ -80,7 +80,6 @@ def search_pipeline(recommender: Recommender):
             hits, recommendations = recommender.search(
                 question=question, corpus="block", top_k=200
             )
-            # recommendations = recommender.format_for_frontend(df, hits)
             render_recommendations_grid(
                 recommendations, mode="search", columns=3, rows=3
             )
