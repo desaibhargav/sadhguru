@@ -19,5 +19,5 @@ STATUS: [POC READY]
 
 ## TO DO:
 1. Update README.md (with basic usage, documentation and purpose of the project).
-2. Take it from POC to PROD using [`FastAPI` x `Streamlit`] for frontend and [Google Cloud Platform / Amazon Web Services] as deployment platform.
+2. Take it from POC to PROD using [`FastAPI` x `Streamlit`] for frontend and [`Google Cloud Platform` / `Amazon Web Services`] as deployment platform.
 3. **ADD. COMMENTS. EVERYWHERE.**
