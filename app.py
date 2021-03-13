@@ -9,7 +9,7 @@ from frontend.utils import (
     process_pipeline,
 )
 from backend.utils import load_from_cache
-from backend.recommender import Recommender
+from backend.recommender import YouTubeRecommender
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
         state["database"] = df
 
     # fit the database
-    if not isinstance(state["recommender"], Recommender):
+    if not isinstance(state["recommender"], YouTubeRecommender):
         recommender_cache_path = os.path.join(
             os.getcwd(), "cache", "recommender.pickle"
         )
@@ -51,7 +51,7 @@ def main():
             recommender = load_from_cache("recommender")
         else:
             with st.spinner("Fitting the database"):
-                recommender = Recommender()
+                recommender = YouTubeRecommender()
                 recommender.fit(
                     corpus=state["database"],
                     columns=["block", "video_title", "video_description"],

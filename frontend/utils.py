@@ -7,7 +7,7 @@ import streamlit as st
 
 from pathlib import Path
 from backend.chunker import Chunker
-from backend.recommender import Recommender
+from backend.recommender import YouTubeRecommender
 from backend.utils import save_to_cache
 
 
@@ -69,7 +69,7 @@ def render_recommendations_grid(
                 grid_pointer += 1
 
 
-def search_pipeline(recommender: Recommender):
+def search_pipeline(recommender: YouTubeRecommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here",
@@ -87,7 +87,7 @@ def search_pipeline(recommender: Recommender):
             st.dataframe(hits)
 
 
-def explore_pipeline(recommender: Recommender):
+def explore_pipeline(recommender: YouTubeRecommender):
     st.header("Explore")
     query = st.text_input("Search here", "love and relationships")
     if st.button("Explore"):
