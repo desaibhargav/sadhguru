@@ -5,3 +5,4 @@ backend/__pycache__/recommender.cpython-39.pyc
 backend/__pycache__/utils.cpython-39.pyc
 .DS_Store
 audio.py
+cache/recommender.pickle
