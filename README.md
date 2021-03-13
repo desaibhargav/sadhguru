@@ -1,4 +1,4 @@
-# VR
+# Ask Sadhguru 
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1oOJkErWRT3gNRAfG89wLk4Dijynthvwx?usp=sharing)
@@ -12,11 +12,12 @@ STATUS: [POC READY]
 
 
 ## ON-GOING TASKS:
-1. frontend/how_does_explore_work.md -> add diagram to simplify understanding.
-2. frontend/how_does_search_work.md -> add diagram to simplify understanding.
+1. backend/recommender.py -> refactor code to integrate podcast recommendations along with YouTube recommendations.
+2. frontend/utils.py -> refactor code to integrate podcast recommendations along with YouTube recommendations. 
+3. backend/clients/podcast_client.py -> clean up code in podcast_client.py
 
 
 ## TO DO:
 1. Update README.md (with basic usage, documentation and purpose of the project).
-2. Take it from POC to PROD [using `FastAPI` x `Streamlit`]
-3. **ADD. COMMENTS. EVERYWHERE. FFS!**
+2. Take it from POC to PROD [using `FastAPI` x `Streamlit` for frontend] and Google Cloud Platform / Amazon Web Services as deployment platform
+3. **ADD. COMMENTS. EVERYWHERE.**
