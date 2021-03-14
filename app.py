@@ -63,7 +63,7 @@ def main():
     #             recommender.fit(corpus=state["database"])
     #     state["recommender"] = recommender
     if not state["recommender"]:
-        if os.path.isfile(os.path.join(os.getcwd(), "cache", "database2.pickle")):
+        if os.path.isfile(os.path.join(os.getcwd(), "cache", "recommender2.pickle")):
             recommender = load_from_cache("recommender2")
         else:
             recommender = Recommender(corpus_dict=state["database"])
