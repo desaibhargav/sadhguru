@@ -27,7 +27,11 @@ class BaseRecommender:
         """
         fit the columns from the corpus to be used for recommendations
         """
-        columns_to_fit = chain.from_iterable(self.feature_to_column_mapping.values())
+        columns_to_fit = self.feature_to_column_mapping.values()
+        columns_to_fit = [
+            [column] if isinstance(column, str) else column for column in columns_to_fit
+        ]
+        columns_to_fit = list(chain.from_iterable(columns_to_fit))
         assert (
             pd.Series(columns_to_fit).isin(self.corpus.columns).all()
         ), "column(s) to fit do not exist in the passed corpus [pd.DataFrame object]"
