@@ -77,9 +77,9 @@ def search_pipeline(recommender: Recommender):
             #     recommendations, mode="search", columns=3, rows=3
             # )
             st.dataframe(results_dict["youtube"]["hits"])
-            st.dataframe(results_dict["youtube"]["recommmendations"])
+            st.dataframe(results_dict["youtube"]["recommendations"])
             st.dataframe(results_dict["podcast"]["hits"])
-            st.dataframe(results_dict["podcast"]["recommmendations"])
+            st.dataframe(results_dict["podcast"]["recommendations"])
 
 
 def explore_pipeline(recommender: Recommender):
@@ -92,9 +92,9 @@ def explore_pipeline(recommender: Recommender):
             #     recommendations, mode="explore", columns=3, rows=3
             # )
             st.dataframe(results_dict["youtube"]["hits"])
-            st.dataframe(results_dict["youtube"]["recommmendations"])
+            st.dataframe(results_dict["youtube"]["recommendations"])
             st.dataframe(results_dict["podcast"]["hits"])
-            st.dataframe(results_dict["podcast"]["recommmendations"])
+            st.dataframe(results_dict["podcast"]["recommendations"])
 
 
 def process_pipeline(database: pd.DataFrame):
