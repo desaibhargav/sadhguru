@@ -4,13 +4,13 @@ from backend.recommenders.podcast_recommender import PodcastRecommender
 
 
 class Recommender:
-    def __init__(self, corpuses: dict):
-        self.corpuses = corpuses
+    def __init__(self, corpus_dict: dict):
+        self.corpus_dict = corpus_dict
         self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
         self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
         self.tracks = {
-            "youtube": YouTubeRecommender(self.corpuses["youtube"]),
-            "podcast": PodcastRecommender(self.corpuses["podcast"]),
+            "youtube": YouTubeRecommender(self.corpus_dict["youtube"]),
+            "podcast": PodcastRecommender(self.corpus_dict["podcast"]),
         }
 
     def fit(self):
