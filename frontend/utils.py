@@ -1,43 +1,38 @@
-import sys
 import os
 import pandas as pd
-import pickle
 import numpy as np
 import streamlit as st
 
 from pathlib import Path
-from backend.chunker import Chunker
-from backend.recommender import YouTubeRecommender
-from backend.utils import save_to_cache
+from backend.recommender import Recommender
 
-
-def create_database(file: str, save_state: bool) -> pd.DataFrame:
-    """"""
-    assert isinstance(
-        file, str
-    ), "please pass the path to a pickled pd.DataFrame object"
-    try:
-        database = pd.read_pickle(file)
-        chunked = Chunker(
-            chunk_by="length", expected_threshold=100, min_tolerable_threshold=75
-        ).get_chunks(database)
-        database_chunked = database.join(chunked).drop(
-            columns=["subtitles", "timestamps"]
-        )
-        database_chunked.dropna(inplace=True)
-        database_chunked = database_chunked.assign(
-            video_description=database_chunked["video_description"]
-            .str.strip()
-            .str.split("\n\n")
-            .str[0],
-            video_title=database_chunked["video_title"].str.strip(),
-        )
-        database_chunked = database_chunked.drop_duplicates(subset="block")
-        if save_state:
-            save_to_cache("database", database_chunked)
-        return database_chunked
-    except pickle.UnpicklingError:
-        sys.exit("The passed file does not point to a pickled pd.DataFrame object")
+# def create_database(file: str, save_state: bool) -> pd.DataFrame:
+#     """"""
+#     assert isinstance(
+#         file, str
+#     ), "please pass the path to a pickled pd.DataFrame object"
+#     try:
+#         database = pd.read_pickle(file)
+#         chunked = Chunker(
+#             chunk_by="length", expected_threshold=100, min_tolerable_threshold=75
+#         ).get_chunks(database)
+#         database_chunked = database.join(chunked).drop(
+#             columns=["subtitles", "timestamps"]
+#         )
+#         database_chunked.dropna(inplace=True)
+#         database_chunked = database_chunked.assign(
+#             video_description=database_chunked["video_description"]
+#             .str.strip()
+#             .str.split("\n\n")
+#             .str[0],
+#             video_title=database_chunked["video_title"].str.strip(),
+#         )
+#         database_chunked = database_chunked.drop_duplicates(subset="block")
+#         if save_state:
+#             save_to_cache("database", database_chunked)
+#         return database_chunked
+#     except pickle.UnpicklingError:
+#         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
 
 
 def render_recommendations_grid(
@@ -69,7 +64,7 @@ def render_recommendations_grid(
                 grid_pointer += 1
 
 
-def search_pipeline(recommender: YouTubeRecommender):
+def search_pipeline(recommender: Recommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here",
@@ -77,30 +72,29 @@ def search_pipeline(recommender: YouTubeRecommender):
     )
     if st.button("Search"):
         with st.spinner("Searching the database"):
-            hits, recommendations = recommender.search(
-                question=question, corpus="block", top_k=200
-            )
-            render_recommendations_grid(
-                recommendations, mode="search", columns=3, rows=3
-            )
-            st.dataframe(recommendations)
-            st.dataframe(hits)
+            results_dict = recommender.search(question=question, top_k=100)
+            # render_recommendations_grid(
+            #     recommendations, mode="search", columns=3, rows=3
+            # )
+            st.dataframe(results_dict["youtube"]["hits"])
+            st.dataframe(results_dict["youtube"]["recommmendations"])
+            st.dataframe(results_dict["podcast"]["hits"])
+            st.dataframe(results_dict["podcast"]["recommmendations"])
 
 
-def explore_pipeline(recommender: YouTubeRecommender):
+def explore_pipeline(recommender: Recommender):
     st.header("Explore")
     query = st.text_input("Search here", "love and relationships")
     if st.button("Explore"):
         with st.spinner("Searching the database"):
-            hits, recommendations = recommender.explore(
-                query=query, corpus=["video_title", "video_description"], top_k=10
-            )
-            # recommendations = recommender.format_for_frontend(df, hits)
-            render_recommendations_grid(
-                recommendations, mode="explore", columns=3, rows=3
-            )
-            st.dataframe(recommendations)
-            st.dataframe(hits)
+            results_dict = recommender.explore(query=query, top_k=10)
+            # render_recommendations_grid(
+            #     recommendations, mode="explore", columns=3, rows=3
+            # )
+            st.dataframe(results_dict["youtube"]["hits"])
+            st.dataframe(results_dict["youtube"]["recommmendations"])
+            st.dataframe(results_dict["podcast"]["hits"])
+            st.dataframe(results_dict["podcast"]["recommmendations"])
 
 
 def process_pipeline(database: pd.DataFrame):
