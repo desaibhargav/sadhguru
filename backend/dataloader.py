@@ -19,8 +19,8 @@ class DataLoader:
         podcast_dataset = podcast_data.join(chunked_podcast_data).drop(
             columns=["subtitles", "timestamps"]
         )
-        podcast_dataset.block = podcast_dataset.block.apply(lambda x: x.lower())
         podcast_dataset = podcast_dataset.dropna().drop_duplicates(subset=["block"])
+        podcast_dataset.block = podcast_dataset.block.apply(lambda x: x.lower())
         return podcast_dataset
 
     @staticmethod
