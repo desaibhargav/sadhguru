@@ -97,7 +97,7 @@ def explore_pipeline(recommender: Recommender):
             st.dataframe(results_dict["podcast"]["recommendations"])
 
 
-def process_pipeline(database: pd.DataFrame):
+def process_pipeline(database: dict):
     data_expander = st.beta_expander("What was the data used?", expanded=True)
     with data_expander:
         raw_dataset = pd.read_pickle(
@@ -117,7 +117,9 @@ def process_pipeline(database: pd.DataFrame):
         st.write(
             "The subtitle for each video is broken down into blocks of fixed length using `chunker.py`, the data that results looks like:"
         )
-        st.dataframe(database.droplevel(level=[1, 2, 3, 4]).reset_index().head())
+        st.dataframe(
+            database["youtube"].droplevel(level=[1, 2, 3, 4]).reset_index().head()
+        )
         data_markdown = Path(
             os.path.join(os.getcwd(), "frontend", "what_data_do_we_use.md")
         ).read_text()
