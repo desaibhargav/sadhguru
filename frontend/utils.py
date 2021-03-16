@@ -85,7 +85,7 @@ class Grid:
             st.write("**Oops, nothing to display**")
 
 
-def experimental_search_pipeline(recommender):
+def experimental_search_pipeline(recommender: Recommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here",
@@ -102,7 +102,7 @@ def experimental_search_pipeline(recommender):
             Grid(rows=3, columns=3, mode="Search").render(search_results, options)
 
 
-def experimental_explore_pipeline(recommender):
+def experimental_explore_pipeline(recommender: Recommender):
     st.header("Explore")
     query = st.text_input("Search here", "meditation and yoga")
     options = st.multiselect(
