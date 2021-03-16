@@ -6,95 +6,114 @@ import streamlit as st
 from pathlib import Path
 from backend.recommender import Recommender
 
-# def create_database(file: str, save_state: bool) -> pd.DataFrame:
-#     """"""
-#     assert isinstance(
-#         file, str
-#     ), "please pass the path to a pickled pd.DataFrame object"
-#     try:
-#         database = pd.read_pickle(file)
-#         chunked = Chunker(
-#             chunk_by="length", expected_threshold=100, min_tolerable_threshold=75
-#         ).get_chunks(database)
-#         database_chunked = database.join(chunked).drop(
-#             columns=["subtitles", "timestamps"]
-#         )
-#         database_chunked.dropna(inplace=True)
-#         database_chunked = database_chunked.assign(
-#             video_description=database_chunked["video_description"]
-#             .str.strip()
-#             .str.split("\n\n")
-#             .str[0],
-#             video_title=database_chunked["video_title"].str.strip(),
-#         )
-#         database_chunked = database_chunked.drop_duplicates(subset="block")
-#         if save_state:
-#             save_to_cache("database", database_chunked)
-#         return database_chunked
-#     except pickle.UnpicklingError:
-#         sys.exit("The passed file does not point to a pickled pd.DataFrame object")
+
+class Grid:
+    def __init__(self, rows: int, columns: int, mode: str) -> None:
+        self.rows = rows
+        self.columns = columns
+        self.mode = mode
+
+    def _render_youtube(self, recommendations: pd.DataFrame) -> None:
+        num_rows = min(
+            int(len(recommendations) / self.rows),
+            self.rows,
+        )
+        youtube_expander = st.beta_expander("Videos for you", expanded=True)
+        with youtube_expander:
+            grid_pointer = 0
+            for _ in range(num_rows):
+                columns = st.beta_columns(self.columns)
+                for column in columns:
+                    with column:
+                        if self.mode == "Search":
+                            st.header(
+                                f"{round(recommendations['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
+                            )
+                            st.video(
+                                recommendations["video_link"].iloc[grid_pointer],
+                                start_time=int(
+                                    recommendations["start"].iloc[grid_pointer]
+                                ),
+                            )
+                        else:
+                            st.subheader(
+                                f"{recommendations['video_title'].iloc[grid_pointer][:35]}..."
+                            )
+                            st.video(recommendations["video_link"].iloc[grid_pointer])
+                        grid_pointer += 1
+
+    def _render_podcast(self, recommendations: pd.DataFrame) -> None:
+        num_rows = min(
+            int(len(recommendations) / self.rows),
+            self.rows,
+        )
+        podcast_expander = st.beta_expander("Podcasts for you", expanded=True)
+        with podcast_expander:
+            grid_pointer = 0
+            for _ in range(num_rows):
+                columns = st.beta_columns(self.columns)
+                for column in columns:
+                    with column:
+                        if self.mode == "Search":
+                            st.header(
+                                f"{round(recommendations['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
+                            )
+                            st.audio(
+                                recommendations["podcast_link"].iloc[grid_pointer],
+                                start_time=int(
+                                    recommendations["start"].iloc[grid_pointer]
+                                ),
+                            )
+                        else:
+                            st.subheader(
+                                f"{recommendations['video_title'].iloc[grid_pointer][:35]}..."
+                            )
+                            st.audio(recommendations["podcast_link"].iloc[grid_pointer])
+                        grid_pointer += 1
+
+    def _render_blogs(self, recommendations: pd.DataFrame) -> None:
+        raise NotImplementedError
+
+    def render(self, results_dict: dict, filters: list) -> None:
+        if "youtube" in filters:
+            recommendations = results_dict["youtube"]["recommendations"]
+            self._render_youtube(recommendations)
+        if "podcast" in filters:
+            recommendations = results_dict["podcast"]["recommendations"]
+            self._render_podcast(recommendations)
+        if not filters:
+            st.write("**Oops, nothing to display**")
 
 
-def render_recommendations_grid(
-    recommendations: pd.DataFrame, mode: str, **grid_specs: int
-):
-    expander = st.beta_expander("Recommmendations", expanded=True)
-    rows = min(
-        int(len(recommendations) / grid_specs.get("rows", 3)), grid_specs.get("rows", 3)
-    )
-    with expander:
-        grid_pointer = 0
-        for row in range(rows):
-            columns = st.beta_columns(grid_specs.get("columns", 3))
-            for column in columns:
-                with column:
-                    if mode == "search":
-                        st.header(
-                            f"{round(recommendations['cross-score'].iloc[grid_pointer] * 100, 2)}% :heart:"
-                        )
-                        st.video(
-                            recommendations["video_link"].iloc[grid_pointer],
-                            start_time=int(recommendations["start"].iloc[grid_pointer]),
-                        )
-                    else:
-                        st.subheader(
-                            f"{recommendations['video_title'].iloc[grid_pointer][:30]}..."
-                        )
-                        st.video(recommendations["video_link"].iloc[grid_pointer])
-                grid_pointer += 1
-
-
-def search_pipeline(recommender: Recommender):
+def experimental_search_pipeline(recommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here",
         "How to be confident while taking big decisions in life?",
     )
+    options = st.multiselect(
+        "Filter by media type",
+        ["youtube", "podcast"],
+        ["youtube", "podcast"],
+    )
     if st.button("Search"):
         with st.spinner("Searching the database"):
-            results_dict = recommender.search(question=question, top_k=100)
-            # render_recommendations_grid(
-            #     recommendations, mode="search", columns=3, rows=3
-            # )
-            st.dataframe(results_dict["youtube"]["hits"])
-            st.dataframe(results_dict["youtube"]["recommendations"])
-            st.dataframe(results_dict["podcast"]["hits"])
-            st.dataframe(results_dict["podcast"]["recommendations"])
+            search_results = recommender.search(question=question, top_k=200)
+            Grid(rows=3, columns=3, mode="Search").render(search_results, options)
 
 
-def explore_pipeline(recommender: Recommender):
+def experimental_explore_pipeline(recommender):
     st.header("Explore")
-    query = st.text_input("Search here", "love and relationships")
+    query = st.text_input("Search here", "meditation and yoga")
+    options = st.multiselect(
+        "Filter by media type",
+        ["youtube", "podcast"],
+        ["youtube", "podcast"],
+    )
     if st.button("Explore"):
         with st.spinner("Searching the database"):
             results_dict = recommender.explore(query=query, top_k=10)
-            # render_recommendations_grid(
-            #     recommendations, mode="explore", columns=3, rows=3
-            # )
-            st.dataframe(results_dict["youtube"]["hits"])
-            st.dataframe(results_dict["youtube"]["recommendations"])
-            st.dataframe(results_dict["podcast"]["hits"])
-            st.dataframe(results_dict["podcast"]["recommendations"])
+            Grid(rows=3, columns=3, mode="Explore").render(results_dict, options)
 
 
 def process_pipeline(database: dict):
@@ -142,6 +161,3 @@ def process_pipeline(database: dict):
             os.path.join(os.getcwd(), "frontend", "what_were_the_models_used.md")
         ).read_text()
         st.markdown(data_markdown, unsafe_allow_html=True)
-
-    # st.markdown(open(os.path.join(os.getcwd(), "README.md")).read())
-    # raise NotImplementedError
