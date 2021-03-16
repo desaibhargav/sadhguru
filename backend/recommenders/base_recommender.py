@@ -1,21 +1,20 @@
 import torch
 import pandas as pd
 
-
+from itertools import chain
 from typing import List, Union, Tuple
-from backend.utils import save_to_cache
 from sentence_transformers import SentenceTransformer, CrossEncoder, util
 
 
 class BaseRecommender:
-    def __init__(self):
-        self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
-        self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
+    def __init__(self, corpus: pd.DataFrame, feature_to_column_mapping: dict):
+        self.corpus = corpus
+        self.feature_to_column_mapping = feature_to_column_mapping
 
-    def _encode(self, content: Union[List[str], str], verbosity: bool) -> torch.Tensor:
-        return self.encoder.encode(
-            content, convert_to_tensor=True, show_progress_bar=verbosity
-        )
+    def _encode(
+        self, content: Union[List[str], str], encoder: SentenceTransformer
+    ) -> torch.Tensor:
+        return encoder.encode(content, convert_to_tensor=True, show_progress_bar=True)
 
     def _semamtic_search(
         self, query_embedding: torch.Tensor, corpus_str: str, top_k: int
@@ -24,27 +23,33 @@ class BaseRecommender:
             query_embedding, self.corpus_embeddings_dict[corpus_str], top_k=top_k
         ).pop()
 
-    def fit(self, corpus: pd.DataFrame, columns: List[str], save_state: bool):
+    def fit(self, encoder: SentenceTransformer):
         """
-        fit the corpuses to be used for recommendations
+        fit the columns from the corpus to be used for recommendations
         """
+        columns_to_fit = self.feature_to_column_mapping.values()
+        columns_to_fit = [
+            [column] if isinstance(column, str) else column for column in columns_to_fit
+        ]
+        columns_to_fit = list(chain.from_iterable(columns_to_fit))
         assert (
-            pd.Series(columns).isin(corpus.columns).all()
-        ), "columns to fit do not exist in the passed pd.DataFrame object"
-        self.corpus = corpus
+            pd.Series(columns_to_fit).isin(self.corpus.columns).all()
+        ), "column(s) to fit do not exist in the passed corpus [pd.DataFrame object]"
         self.corpus_embeddings_dict = {
-            column: self._encode(corpus[column].unique(), verbosity=True)
-            for column in columns
+            column: self._encode(self.corpus[column].unique(), encoder=encoder)
+            for column in columns_to_fit
         }
-        if save_state:
-            save_to_cache("recommender", self)
 
     def search(
-        self, question: str, corpus: str, top_k: int
+        self,
+        question: str,
+        encoder: SentenceTransformer,
+        cross_encoder: CrossEncoder,
+        top_k: int,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         pass
 
     def explore(
-        self, query: str, corpus: List[str], top_k: int
+        self, query: str, encoder: SentenceTransformer, top_k: int
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         pass

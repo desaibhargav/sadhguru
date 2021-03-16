@@ -3,20 +3,20 @@ import pandas as pd
 import os
 
 from frontend.utils import (
-    create_database,
-    search_pipeline,
-    explore_pipeline,
     process_pipeline,
+    experimental_explore_pipeline,
+    experimental_search_pipeline,
 )
-from backend.utils import load_from_cache
-from backend.recommender import YouTubeRecommender
+from backend.utils import load_from_cache, save_to_cache
+from backend.dataloader import DataLoader
+from backend.recommender import Recommender
 
 
 def main():
     # set page config
     st.set_page_config(
         page_title="Ask Sadhguru",
-        layout="centered",
+        layout="wide",
         initial_sidebar_state="expanded",
     )
     # set some variables
@@ -26,37 +26,21 @@ def main():
     # set the title
     st.title("Ask Sadhguru")
 
-    # create the database
-    if not isinstance(state["database"], pd.DataFrame):
-        database_cache_path = os.path.join(os.getcwd(), "cache", "database.pickle")
-        if os.path.isfile(database_cache_path):
-            df = load_from_cache("database")
+    if not state["database"]:
+        if os.path.isfile(os.path.join(os.getcwd(), "cache", "database2.pickle")):
+            database_dict = load_from_cache("database2")
         else:
-            df = load_database(
-                os.path.join(
-                    os.getcwd(),
-                    "datasets",
-                    "youtube_scrapped_complete_protocol5.pickle",
-                ),
-                save_state=True,
-            )
-        state["database"] = df
+            database_dict = load_database()
+            save_to_cache("database2", database_dict)
+        state["database"] = database_dict
 
-    # fit the database
-    if not isinstance(state["recommender"], YouTubeRecommender):
-        recommender_cache_path = os.path.join(
-            os.getcwd(), "cache", "recommender.pickle"
-        )
-        if os.path.isfile(recommender_cache_path):
-            recommender = load_from_cache("recommender")
+    if not state["recommender"]:
+        if os.path.isfile(os.path.join(os.getcwd(), "cache", "recommender2.pickle")):
+            recommender = load_from_cache("recommender2")
         else:
-            with st.spinner("Fitting the database"):
-                recommender = YouTubeRecommender()
-                recommender.fit(
-                    corpus=state["database"],
-                    columns=["block", "video_title", "video_description"],
-                    save_state=True,
-                )
+            recommender = Recommender(corpus_dict=state["database"])
+            recommender.fit()
+            save_to_cache("recommender2", recommender)
         state["recommender"] = recommender
 
     # once we have the dependencies, add a selector for the app mode on the sidebar.
@@ -69,16 +53,18 @@ def main():
         process_pipeline(state["database"])
     elif app_mode == "Search":
         st.sidebar.success("Search selected")
-        search_pipeline(state["recommender"])
+        experimental_search_pipeline(state["recommender"])
     elif app_mode == "Explore":
         st.sidebar.success("Explore selected")
-        explore_pipeline(state["recommender"])
+        experimental_explore_pipeline(state["recommender"])
 
 
 @st.cache(allow_output_mutation=True, show_spinner=True)
-def load_database(file: str, save_state: bool) -> pd.DataFrame:
+def load_database() -> dict:
     """"""
-    return create_database(file, save_state=save_state)
+    youtube_dataset = DataLoader.load_youtube_dataset()
+    podcast_dataset = DataLoader.load_podcast_dataset()
+    return {"youtube": youtube_dataset, "podcast": podcast_dataset}
 
 
 @st.cache(allow_output_mutation=True, show_spinner=True)

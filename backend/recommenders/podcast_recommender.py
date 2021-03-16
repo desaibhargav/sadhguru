@@ -1,33 +1,46 @@
 import pandas as pd
 
-from typing import List, Tuple
+from typing import Tuple
+from sentence_transformers import SentenceTransformer, CrossEncoder
 from backend.recommenders.base_recommender import BaseRecommender
 
 
 class PodcastRecommender(BaseRecommender):
-    def __init__(self):
-        super(PodcastRecommender, self).__init__()
+    def __init__(self, corpus: pd.DataFrame, feature_to_column_mapping: dict = dict()):
+        if not feature_to_column_mapping:
+            feature_to_column_mapping = {
+                "search": "block",
+                "explore": ["title", "excerpt"],
+            }
+        super(PodcastRecommender, self).__init__(
+            corpus=corpus, feature_to_column_mapping=feature_to_column_mapping
+        )
 
     def search(
-        self, question: str, corpus: str, top_k: int
+        self,
+        question: str,
+        encoder: SentenceTransformer,
+        cross_encoder: CrossEncoder,
+        top_k: int,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         semantic search
         """
+        column = self.feature_to_column_mapping["search"]
         assert (
-            corpus in self.corpus_embeddings_dict
-        ), f"Embeddings for [{corpus}] not found, please fit [{corpus}] first using the .fit() call"
-        question_embedding = self._encode(question, verbosity=False)
-        hits = self._semamtic_search(question_embedding, corpus, top_k)
+            column in self.corpus_embeddings_dict
+        ), f"Embeddings for [{column}] not found, please fit [{column}] first using the .fit() call"
+        question_embedding = self._encode(question, encoder)
+        hits = self._semamtic_search(question_embedding, column, top_k)
 
         # score all retrieved passages with the cross_encoder
-        cross_inp = [[question, self.corpus[corpus][hit["corpus_id"]]] for hit in hits]
-        cross_scores = self.cross_encoder.predict(cross_inp)
+        cross_inp = [[question, self.corpus[column][hit["corpus_id"]]] for hit in hits]
+        cross_scores = cross_encoder.predict(cross_inp)
 
         # sort results by the cross-encoder scores
         for idx in range(len(cross_scores)):
             hits[idx]["cross-score"] = cross_scores[idx]
-            hits[idx]["snippet"] = self.corpus[corpus][hits[idx]["corpus_id"]].replace(
+            hits[idx]["snippet"] = self.corpus[column][hits[idx]["corpus_id"]].replace(
                 "\n", " "
             )
 
@@ -55,26 +68,26 @@ class PodcastRecommender(BaseRecommender):
         return (hits, recommendations)
 
     def explore(
-        self, query: str, corpus: List[str], top_k: int
+        self, query: str, encoder: SentenceTransformer, top_k: int
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        assert all(corpus_str in self.corpus_embeddings_dict for corpus_str in corpus)
-        question_embedding = self._encode(query, verbosity=False)
+        columns = self.feature_to_column_mapping["explore"]
+        assert all(column in self.corpus_embeddings_dict for column in columns)
 
         # get hits
-        question_embedding = self._encode(query, verbosity=False)
+        question_embedding = self._encode(query, encoder)
         hits = pd.concat(
             [
                 pd.DataFrame(
-                    self._semamtic_search(question_embedding, corpus_str, top_k=10)
+                    self._semamtic_search(question_embedding, column, top_k=top_k)
                 )
-                for corpus_str in corpus
+                for column in columns
             ],
             axis=1,
         )
 
         # format hits
-        hits.columns = (" score ".join(corpus) + " score ").strip().split()
-        hits_corpus = pd.DataFrame(hits.loc[:, corpus].stack()).reset_index()
+        hits.columns = (" score ".join(columns) + " score ").strip().split()
+        hits_corpus = pd.DataFrame(hits.loc[:, columns].stack()).reset_index()
         hits_score = pd.DataFrame(hits.loc[:, ["score"]].stack()).reset_index(drop=True)
         hits = pd.concat([hits_corpus, hits_score], axis=1).drop(columns=["level_0"])
         hits.columns = ["type", "corpus_id", "score"]

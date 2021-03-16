@@ -1,10 +1,54 @@
-# import torch
-# import pandas as pd
+from sentence_transformers import SentenceTransformer, CrossEncoder
+from backend.recommenders.youtube_recommender import YouTubeRecommender
+from backend.recommenders.podcast_recommender import PodcastRecommender
 
 
-# from typing import List, Union, Tuple
-# from backend.utils import save_to_cache
-# from sentence_transformers import SentenceTransformer, CrossEncoder, util
+class Recommender:
+    def __init__(self, corpus_dict: dict):
+        self.corpus_dict = corpus_dict
+        self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
+        self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
+        self.tracks = {
+            "youtube": YouTubeRecommender(self.corpus_dict["youtube"]),
+            "podcast": PodcastRecommender(self.corpus_dict["podcast"]),
+        }
+
+    def fit(self):
+        for recommender in self.tracks.values():
+            recommender.fit(encoder=self.encoder)
+
+    def search(self, question: str, top_k: int) -> dict:
+        results = [
+            (
+                track,
+                recommender.search(
+                    question=question,
+                    encoder=self.encoder,
+                    cross_encoder=self.cross_encoder,
+                    top_k=top_k,
+                ),
+            )
+            for track, recommender in self.tracks.items()
+        ]
+        results_dict = {
+            track: {"hits": results[0], "recommendations": results[1]}
+            for track, results in dict(results).items()
+        }
+        return results_dict
+
+    def explore(self, query: str, top_k: int) -> dict:
+        results = [
+            (
+                track,
+                recommender.explore(query=query, encoder=self.encoder, top_k=top_k),
+            )
+            for track, recommender in self.tracks.items()
+        ]
+        results_dict = {
+            track: {"hits": results[0], "recommendations": results[1]}
+            for track, results in dict(results).items()
+        }
+        return results_dict
 
 
 # class BaseRecommender:

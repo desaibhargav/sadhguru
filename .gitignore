@@ -6,3 +6,9 @@ backend/__pycache__/utils.cpython-39.pyc
 .DS_Store
 audio.py
 cache/recommender.pickle
+backend/recommenders/__pycache__/base_recommender.cpython-39.pyc
+backend/recommenders/__pycache__/youtube_recommender.cpython-39.pyc
+backend/clients/__pycache__/podcast_client.cpython-39.pyc
+backend/__pycache__/dataloader.cpython-39.pyc
+backend/recommenders/__pycache__/podcast_recommender.cpython-39.pyc
+cache/recommender2.pickle
