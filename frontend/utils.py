@@ -89,7 +89,7 @@ def experimental_search_pipeline(recommender: Recommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here",
-        "How to be confident while taking big decisions in life?",
+        "What is the most fundamemtal aspect of yoga?",
     )
     options = st.multiselect(
         "Filter by media type",
