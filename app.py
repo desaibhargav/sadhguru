@@ -4,8 +4,8 @@ import os
 
 from frontend.utils import (
     process_pipeline,
-    experimental_explore_pipeline,
-    experimental_search_pipeline,
+    explore_pipeline,
+    search_pipeline,
 )
 from backend.utils import load_from_cache, save_to_cache
 from backend.dataloader import DataLoader
@@ -53,10 +53,10 @@ def main():
         process_pipeline(state["database"])
     elif app_mode == "Search":
         st.sidebar.success("Search selected")
-        experimental_search_pipeline(state["recommender"])
+        search_pipeline(state["recommender"])
     elif app_mode == "Explore":
         st.sidebar.success("Explore selected")
-        experimental_explore_pipeline(state["recommender"])
+        explore_pipeline(state["recommender"])
 
 
 @st.cache(allow_output_mutation=True, show_spinner=True)
