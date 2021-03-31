@@ -48,7 +48,7 @@ class PodcastRecommender(BaseRecommender):
         hits = (
             pd.DataFrame(hits)
             .sort_values("cross-score", ascending=False)
-            .query("`cross-score` >= 0.15")
+            .query("`cross-score` >= 0.10")
         )
         recommendations = hits.assign(
             podcast_link=hits.corpus_id.apply(
