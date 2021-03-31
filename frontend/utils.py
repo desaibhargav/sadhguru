@@ -13,6 +13,11 @@ class Grid:
         self.columns = columns
         self.mode = mode
 
+    def _print_not_found_message(self):
+        st.write(
+            "*Oops, looks like we couldn't find a match, try quering for something else?*"
+        )
+
     def _render_youtube(self, recommendations: pd.DataFrame) -> None:
         num_rows = min(
             int(len(recommendations) / self.rows),
@@ -20,6 +25,8 @@ class Grid:
         )
         youtube_expander = st.beta_expander("Videos for you", expanded=True)
         with youtube_expander:
+            if not num_rows:
+                self._print_not_found_message()
             grid_pointer = 0
             for _ in range(num_rows):
                 columns = st.beta_columns(self.columns)
@@ -49,6 +56,8 @@ class Grid:
         )
         podcast_expander = st.beta_expander("Podcasts for you", expanded=True)
         with podcast_expander:
+            if not num_rows:
+                self._print_not_found_message()
             grid_pointer = 0
             for _ in range(num_rows):
                 columns = st.beta_columns(self.columns)
@@ -85,7 +94,7 @@ class Grid:
             st.write("**Oops, nothing to display**")
 
 
-def experimental_search_pipeline(recommender: Recommender):
+def search_pipeline(recommender: Recommender):
     st.header("Search")
     question = st.text_area(
         "Enter your question here",
@@ -102,7 +111,7 @@ def experimental_search_pipeline(recommender: Recommender):
             Grid(rows=3, columns=3, mode="Search").render(search_results, options)
 
 
-def experimental_explore_pipeline(recommender: Recommender):
+def explore_pipeline(recommender: Recommender):
     st.header("Explore")
     query = st.text_input("Search here", "meditation and yoga")
     options = st.multiselect(
@@ -112,7 +121,7 @@ def experimental_explore_pipeline(recommender: Recommender):
     )
     if st.button("Explore"):
         with st.spinner("Searching the database"):
-            results_dict = recommender.explore(query=query, top_k=10)
+            results_dict = recommender.explore(query=query, top_k=50)
             Grid(rows=3, columns=3, mode="Explore").render(results_dict, options)
 
 
