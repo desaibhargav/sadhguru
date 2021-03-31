@@ -48,7 +48,7 @@ class YouTubeRecommender(BaseRecommender):
         hits = (
             pd.DataFrame(hits)
             .sort_values("cross-score", ascending=False)
-            .query("`cross-score` >= 0.0")
+            .query("`cross-score` >= 0.15")
         )
         recommendations = hits.assign(
             video_link=hits.corpus_id.apply(
