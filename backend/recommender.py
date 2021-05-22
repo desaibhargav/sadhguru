@@ -6,8 +6,8 @@ from backend.recommenders.podcast_recommender import PodcastRecommender
 class Recommender:
     def __init__(self, corpus_dict: dict):
         self.corpus_dict = corpus_dict
-        self.encoder = SentenceTransformer("paraphrase-distilroberta-base-v1")
-        self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-electra-base")
+        self.encoder = SentenceTransformer("msmarco-distilbert-base-tas-b")
+        self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
         self.tracks = {
             "youtube": YouTubeRecommender(self.corpus_dict["youtube"]),
             "podcast": PodcastRecommender(self.corpus_dict["podcast"]),
