@@ -1,3 +1,4 @@
+import torch
 import pandas as pd
 
 from typing import Tuple
@@ -35,7 +36,7 @@ class PodcastRecommender(BaseRecommender):
 
         # score all retrieved passages with the cross_encoder
         cross_inp = [[question, self.corpus[column][hit["corpus_id"]]] for hit in hits]
-        cross_scores = cross_encoder.predict(cross_inp)
+        cross_scores = cross_encoder.predict(cross_inp, activation_fct=torch.sigmoid)
 
         # sort results by the cross-encoder scores
         for idx in range(len(cross_scores)):
@@ -48,7 +49,7 @@ class PodcastRecommender(BaseRecommender):
         hits = (
             pd.DataFrame(hits)
             .sort_values("cross-score", ascending=False)
-            .query("`cross-score` >= 0.10")
+            .query("`cross-score` >= 0.15")
         )
         recommendations = hits.assign(
             podcast_link=hits.corpus_id.apply(
@@ -56,12 +57,13 @@ class PodcastRecommender(BaseRecommender):
                     self.corpus.index.get_level_values(0)[x]
                 ].audio_url.to_list()[0]
             ),
+            podcast_title=hits.corpus_id.apply(lambda x: self.corpus.title.iloc[x]),
             snippet=hits.corpus_id.apply(lambda x: self.corpus.block.iloc[x]),
             start=hits.corpus_id.apply(lambda x: self.corpus.start_time.iloc[x]),
             end=hits.corpus_id.apply(lambda x: self.corpus.end_time.iloc[x]),
         ).sort_values("start")
         recommendations = (
-            recommendations.groupby("podcast_link", as_index=False)
+            recommendations.groupby(["podcast_link", "title"], as_index=False)
             .agg({"start": "min", "end": "max", "cross-score": "max"})
             .sort_values("cross-score", ascending=False)
         )
