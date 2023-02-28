@@ -8,7 +8,12 @@
 
 Repository for Sadhguru video recommendation project
 
+
 STATUS: [POC READY]
+
+## DEMO
+
+Find the demo of the project pilot [here](https://drive.google.com/file/d/1b1PHEWk8HjW5ysHbsPNL2oAw0COIsG8b/view?usp=sharing)
 
 
 ## ON-GOING TASKS:
