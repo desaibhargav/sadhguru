@@ -5,8 +5,11 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/desaibhargav/VR/AskSadhguru/)
 
 
+Repository for Sadhguru video recommendation project for the NGO Isha Foundation. The aim is to provide a natural language interface to users to "ask" questions and be given specific excerpts from Sadhguru's YouTube videos, blogs, or podcasts that "answer" those questions. 
 
-Repository for Sadhguru video recommendation project
+This project was created during the pandemic of 2020, which was an especially hard time, in the cause of mental well-being and stability. From burdening existential questions, to practical advice, this project was made to be a guiding light for anyone and everyone. 
+
+This PoC project was done in collaboration with the Isha Foundation, and was handed over to their technical team for deployment on their official app. 
 
 
 STATUS: [POC READY]
